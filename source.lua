@@ -1,6 +1,3 @@
--- Hook Rivals UI Library (Purple Theme)
--- AccentColor: #8C3CDC  |  Background: deep purple-black  |  Main: dark purple-grey
-
 local InputService = game:GetService('UserInputService');
 local TextService = game:GetService('TextService');
 local CoreGui = game:GetService('CoreGui');
