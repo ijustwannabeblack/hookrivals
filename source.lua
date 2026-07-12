@@ -16,15 +16,12 @@ ProtectGui(ScreenGui);
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 ScreenGui.Parent = CoreGui;
 
--- Spinning logo (TextLabel with star symbol)
-local BgLogo = Instance.new('TextLabel');
-BgLogo.Size = UDim2.new(0, 200, 0, 200);
-BgLogo.Position = UDim2.new(0.5, -100, 0.5, -100);
+-- Spinning logo
+local BgLogo = Instance.new('ImageLabel');
+BgLogo.Size = UDim2.new(0, 300, 0, 300);
+BgLogo.Position = UDim2.new(0.5, -150, 0.5, -150);
 BgLogo.BackgroundTransparency = 1;
-BgLogo.Text = '✦';
-BgLogo.TextColor3 = Color3.fromRGB(128, 0, 255);
-BgLogo.TextSize = 120;
-BgLogo.Font = Enum.Font.GothamMedium;
+BgLogo.Image = 'rbxassetid://81877860557650';
 BgLogo.ZIndex = 0;
 BgLogo.Visible = false;
 BgLogo.Parent = ScreenGui;
@@ -3497,6 +3494,7 @@ function Library:CreateWindow(...)
     function Library.Toggle()
         Outer.Visible = not Outer.Visible;
         BgLogo.Visible = Outer.Visible;
+        if Library.KeybindFrame then Library.KeybindFrame.Visible = Outer.Visible end
         ModalElement.Modal = Outer.Visible;
 
         local oIcon = Mouse.Icon;
