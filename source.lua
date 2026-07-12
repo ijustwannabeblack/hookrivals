@@ -16,8 +16,6 @@ ProtectGui(ScreenGui);
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 ScreenGui.Parent = CoreGui;
 
-
-
 -- Spinning logo
 local BgLogo = Instance.new('ImageLabel');
 BgLogo.Size = UDim2.new(0, 300, 0, 300);
