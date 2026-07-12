@@ -1731,8 +1731,102 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			Default = false,
 			Flag = nil,
 			Callback = EmptyFunction,
+			Keybind = nil,
 		});
 
+		local IsBinding = false;
+
+		-- KEYBIND BOX (on the left of the toggle)
+		local KeybindFrame;
+		local KeybindLabel;
+
+		if Config.Keybind then
+			local UICorner_kb = Instance.new("UICorner")
+			local UIStroke_kb = Instance.new("UIStroke")
+
+			KeybindFrame = Instance.new("Frame")
+			KeybindFrame.Name = NeverLose.RandomString();
+			KeybindFrame.Parent = Handler
+			KeybindFrame.BackgroundColor3 = Color3.fromRGB(26, 28, 36)
+			KeybindFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			KeybindFrame.BorderSizePixel = 0
+			KeybindFrame.ClipsDescendants = true
+			KeybindFrame.Size = UDim2.new(0, 45, 0, 18)
+			KeybindFrame.ZIndex = ZINdex + 13
+			KeybindFrame.LayoutOrder = -(#Handler:GetChildren() + 5);
+
+			UICorner_kb.CornerRadius = UDim.new(0, 4)
+			UICorner_kb.Parent = KeybindFrame
+
+			UIStroke_kb.Transparency = 0.650
+			UIStroke_kb.Color = Color3.fromRGB(45, 48, 58)
+			UIStroke_kb.Parent = KeybindFrame
+
+			KeybindLabel = Instance.new("TextLabel")
+			KeybindLabel.Name = NeverLose.RandomString();
+			KeybindLabel.Parent = KeybindFrame
+			KeybindLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+			KeybindLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			KeybindLabel.BackgroundTransparency = 1.000
+			KeybindLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			KeybindLabel.BorderSizePixel = 0
+			KeybindLabel.ClipsDescendants = true
+			KeybindLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+			KeybindLabel.Size = UDim2.new(1, 0, 1, 0)
+			KeybindLabel.ZIndex = ZINdex + 14
+			KeybindLabel.Font = Enum.Font.GothamMedium
+			KeybindLabel.Text = NeverLose:KeyCodeToStr(Config.Keybind)
+			KeybindLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			KeybindLabel.TextSize = 10.000
+			KeybindLabel.TextTransparency = 0.500
+
+			local function updateKeybindSize()
+				local size = TextService:GetTextSize(KeybindLabel.Text,KeybindLabel.TextSize,KeybindLabel.Font,Vector2.new(math.huge,math.huge));
+				KeybindFrame.Size = UDim2.new(0, size.X + 7, 0, 18)
+			end;
+
+			updateKeybindSize();
+
+			local function updateKeybindVisual(on)
+				if on then
+					NeverLose.PlayAnimate(KeybindFrame,SlowyTween,{
+						BackgroundColor3 = NeverLose.AccentColor
+					})
+					NeverLose.PlayAnimate(KeybindLabel,SlowyTween,{
+						TextTransparency = 0
+					})
+				else
+					NeverLose.PlayAnimate(KeybindFrame,SlowyTween,{
+						BackgroundColor3 = Color3.fromRGB(26, 28, 36)
+					})
+					NeverLose.PlayAnimate(KeybindLabel,SlowyTween,{
+						TextTransparency = 0.500
+					})
+				end;
+			end;
+
+			NeverLose:CreateInput(KeybindFrame, function()
+				if IsBinding then return end
+				IsBinding = true
+				KeybindLabel.Text = "..."
+				updateKeybindSize()
+
+				local Selected = nil
+				while not Selected do
+					local Key = UserInputService.InputBegan:Wait()
+					if Key.KeyCode ~= Enum.KeyCode.Unknown then
+						Selected = Key.KeyCode
+					end
+				end
+
+				IsBinding = false
+				Config.Keybind = typeof(Selected) == "string" and Selected or Selected.Name
+				KeybindLabel.Text = NeverLose:KeyCodeToStr(Config.Keybind)
+				updateKeybindSize()
+			end)
+		end
+
+		-- TOGGLE SWITCH
 		local Toggle = Instance.new("Frame")
 		local UICorner = Instance.new("UICorner")
 		local Circle = Instance.new("Frame")
@@ -1766,7 +1860,8 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		UICorner_2.Parent = Circle
 
 		local ToggleLib = {
-			Root = Toggle	
+			Root = Toggle,
+			KeybindFrame = KeybindFrame,
 		};
 
 		ToggleLib.SetUI = LPH_NO_VIRTUALIZE(function(value)
@@ -1793,6 +1888,10 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 					Position = UDim2.new(0.300000012, 0, 0.5, 0)
 				})
 			end;
+
+			if KeybindFrame and KeybindLabel then
+				updateKeybindVisual(value)
+			end;
 		end);
 
 		ToggleLib.SetVisible = LPH_NO_VIRTUALIZE(function(value)
@@ -1809,6 +1908,15 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 					BackgroundTransparency = 1,
 					Position = UDim2.new(0.300000012, 0, 0.5, 0)
 				})
+
+				if KeybindFrame then
+					NeverLose.PlayAnimate(KeybindFrame,SlowyTween,{
+						BackgroundTransparency = 1
+					})
+					NeverLose.PlayAnimate(KeybindLabel,SlowyTween,{
+						TextTransparency = 1
+					})
+				end;
 			end;
 		end);
 
@@ -1825,6 +1933,29 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 
 		ToggleLib.Signal = Signal:Connect(ToggleLib.SetVisible);
 
+		-- Global keybind listener
+		if Config.Keybind then
+			task.spawn(function()
+				while task.wait() do
+					if Config.Keybind then break end
+				end
+
+				NeverLose:AddSignal(UserInputService.InputBegan:Connect(function(input, gpe)
+					if gpe or IsBinding then return end
+					local bk = Config.Keybind
+					if not bk then return end
+					local pressed = input.KeyCode ~= Enum.KeyCode.Unknown and input.KeyCode.Name or nil
+					if pressed and (pressed == bk or NeverLose.KeyEnum[pressed] == bk) then
+						Config.Default = not Config.Default
+						if Signal:GetValue() then
+							ToggleLib.SetUI(Config.Default)
+						end
+						Config.Callback(Config.Default)
+					end
+				end))
+			end)
+		end
+
 		function ToggleLib:GetValue()
 			return Config.Default;
 		end;
@@ -1833,11 +1964,23 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			Config.Default = v;
 
 			if Signal:GetValue() then
-				ToggleLib.SetUI(Config.Default);
+				ToggleLib.SetUI(Config.Default)
 			end;
 
 			Config.Callback(Config.Default)
 		end;
+
+		function ToggleLib:GetKeybind()
+			return Config.Keybind
+		end;
+
+		function ToggleLib:SetKeybind(v)
+			Config.Keybind = v
+			if KeybindLabel then
+				KeybindLabel.Text = NeverLose:KeyCodeToStr(v)
+				updateKeybindSize()
+			end
+		end
 
 		if Config.Flag then
 			NeverLose.Flags[Config.Flag] = ToggleLib;
