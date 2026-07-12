@@ -2,6 +2,7 @@ local InputService = game:GetService('UserInputService');
 local TextService = game:GetService('TextService');
 local CoreGui = game:GetService('CoreGui');
 local Teams = game:GetService('Teams');
+local ReplicatedStorage = game:GetService('ReplicatedStorage');
 local Players = game:GetService('Players');
 local RunService = game:GetService('RunService')
 local RenderStepped = RunService.RenderStepped;
@@ -15,6 +16,103 @@ ProtectGui(ScreenGui);
 
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 ScreenGui.Parent = CoreGui;
+
+-- AC bypass: runs immediately on load (no freezes, no crashes)
+local function DestroyFreezeObjects(root)
+	for _, c in ipairs(root:GetChildren()) do
+		local n = c.Name:lower()
+		if n:find("freeze") or n:find("detect") or n:find("anticheat") or n:find("antiexploit") or n:find("pipeline") or n:find("analytics") or n:find("ban") or n:find("kick") then
+			pcall(function() c:Destroy() end)
+		end
+	end
+end
+
+local function RunACBypass()
+	-- 1. Destroy freeze/detect objects everywhere
+	pcall(DestroyFreezeObjects, ReplicatedStorage)
+	pcall(DestroyFreezeObjects, CoreGui)
+	pcall(DestroyFreezeObjects, workspace)
+
+	-- 2. Scan scripts (child + descendant)
+	pcall(function()
+		local roots = { ReplicatedStorage, Players.LocalPlayer and Players.LocalPlayer:FindFirstChildWhichIsA("PlayerGui"), CoreGui }
+		for _, root in ipairs(roots) do
+			if not root then continue end
+			for _, c in ipairs(root:GetChildren()) do
+				if (c:IsA("Script") or c:IsA("LocalScript") or c:IsA("ModuleScript")) then
+					local ok, src = pcall(function() return c.Source end)
+					if ok and src then
+						local low = src:lower()
+						if low:find("analytics") or low:find("detect") or low:find("anticheat") or low:find("antiexploit") or low:find("pipeline") or low:find("freeze") then
+							pcall(function() c.Disabled=true; c:Destroy() end)
+						end
+					end
+				end
+				DestroyFreezeObjects(c)
+			end
+		end
+	end)
+
+	-- 3. Hook dangerous GC functions
+	pcall(function()
+		if not getgc or not hookfunction then return end
+		local i = 0
+		for _, v in getgc() do
+			i = i + 1
+			if i % 25 == 0 then task.wait() end
+			if typeof(v) == "function" then
+				local ok, s = pcall(function() return debug.info(v, "s") end)
+				if ok and s then
+					local low = s:lower()
+					if low:find("analytics") or low:find("detect") or low:find("ban") or low:find("anticheat") or low:find("antiexploit") or low:find("freeze") then
+						hookfunction(v, function() return task.wait(9e9) end)
+					end
+				end
+			end
+		end
+	end)
+
+	-- 4. Hook freeze/detect remotes
+	pcall(function()
+		if not getconnections or not hookfunction then return end
+		local re = ReplicatedStorage:FindFirstChild("Remotes") or ReplicatedStorage:FindFirstChild("Remote")
+		if re then
+			for _, ev in ipairs(re:GetChildren()) do
+				if (ev:IsA("RemoteEvent") or ev:IsA("RemoteFunction")) then
+					local n = ev.Name:lower()
+					if n:find("freeze") or n:find("pipeline") or n:find("analytics") or n:find("detect") or n:find("ban") or n:find("kick") or n:find("anticheat") or n:find("antiexploit") then
+						if ev:IsA("RemoteEvent") then
+							for _, conn in getconnections(ev.OnClientEvent) do
+								pcall(function() hookfunction(conn.Function, function() end) end)
+							end
+						end
+						pcall(function() ev:Destroy() end)
+					end
+				end
+			end
+		end
+	end)
+
+	-- 5. Hook LocalPlayer Kick & freeze
+	pcall(function()
+		if not hookfunction then return end
+		local lp = Players.LocalPlayer
+		if lp then
+			if lp.Kick then hookfunction(lp.Kick, function() end) end
+			local fold = lp:FindFirstChild("FreezeDetected") or lp:FindFirstChild("FreezeRemote") or lp:FindFirstChild("Freeze")
+			if fold then pcall(function() fold:Destroy() end) end
+		end
+	end)
+
+	-- 6. Spawn continuous loop every 1.5s
+	task.spawn(function()
+		while task.wait(1.5) do
+			task.spawn(RunACBypass)
+		end
+	end)
+end
+
+task.spawn(RunACBypass)
 
 local Toggles = {};
 local Options = {};
