@@ -15,7 +15,7 @@ local ScreenGui = Instance.new('ScreenGui');
 ProtectGui(ScreenGui);
 
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
-ScreenGui.Parent = CoreGui;
+ScreenGui.Parent = pcall(gethui) and gethui() or CoreGui;
 
 -- Spinning background image behind UI
 local BgImage = Instance.new('ImageLabel')
