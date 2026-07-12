@@ -1246,7 +1246,7 @@ do
                 end;
             end;
 
-            Library.KeybindFrame.Size = UDim2.new(0, math.max(XSize + 10, 210), 0, YSize + 23)
+            Library.KeybindFrame.Size = UDim2.new(0, 260, 0, YSize + 23)
         end;
 
         function KeyPicker:GetState()
@@ -3552,7 +3552,7 @@ function Library:CreateWindow(...)
 
     -- Resize handle (bottom-right corner)
     local ResizeGrip = Instance.new('Frame');
-    ResizeGrip.BackgroundColor3 = Color3.fromRGB(0, 85, 255);
+    ResizeGrip.BackgroundColor3 = Color3.fromRGB(128, 0, 255);
     ResizeGrip.BorderSizePixel = 0;
     ResizeGrip.AnchorPoint = Vector2.new(1, 1);
     ResizeGrip.Position = UDim2.new(1, 0, 1, 0);
