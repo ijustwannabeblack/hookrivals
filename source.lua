@@ -1106,6 +1106,8 @@ do
             Parent = ToggleLabel.Parent.Parent;
         });
 
+        if Info.NoUI then PickOuter.Visible = false end
+
         local function UpdateKeyPos()
             PickOuter.Position = UDim2.new(0, Container.AbsoluteSize.X - 28 - 3, 0, -1);
         end
