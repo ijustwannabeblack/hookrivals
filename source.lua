@@ -14,6 +14,7 @@ local ScreenGui = Instance.new('ScreenGui');
 ProtectGui(ScreenGui);
 
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
+ScreenGui.DisplayOrder = 100;
 ScreenGui.Parent = CoreGui;
 
 -- Background overlay + spinning logo
@@ -3461,6 +3462,45 @@ function Library:CreateWindow(...)
         Modal = false;
         Parent = ScreenGui;
     });
+
+    -- Resize handle (bottom-right corner)
+    local ResizeGrip = Library:Create('ImageLabel', {
+        BackgroundTransparency = 1;
+        Image = 'rbxassetid://6031094678';
+        ImageColor3 = Color3.fromRGB(150, 150, 150);
+        AnchorPoint = Vector2.new(1, 1);
+        Position = UDim2.new(1, 0, 1, 0);
+        Size = UDim2.new(0, 14, 0, 14);
+        ZIndex = 10;
+        Parent = Outer;
+    });
+
+    do
+        local resizing = false
+        local startPos, startSize
+
+        ResizeGrip.InputBegan:Connect(function(Input)
+            if Input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+            resizing = true
+            startPos = Vector2.new(Mouse.X, Mouse.Y)
+            startSize = Outer.Size
+
+            while resizing and InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
+                local delta = Vector2.new(Mouse.X, Mouse.Y) - startPos
+                local newW = math.max(300, startSize.X.Offset + delta.X)
+                local newH = math.max(200, startSize.Y.Offset + delta.Y)
+                Outer.Size = UDim2.new(0, newW, 0, newH)
+                RenderStepped:Wait()
+            end
+            resizing = false
+        end)
+
+        InputService.InputEnded:Connect(function(Input)
+            if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+                resizing = false
+            end
+        end)
+    end
 
     function Library.Toggle()
         Outer.Visible = not Outer.Visible;
