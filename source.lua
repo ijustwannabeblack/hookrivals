@@ -14,34 +14,9 @@ local ScreenGui = Instance.new('ScreenGui');
 ProtectGui(ScreenGui);
 
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
-ScreenGui.DisplayOrder = 100;
 ScreenGui.Parent = CoreGui;
 
--- Background overlay + spinning logo
-local BgOverlay = Instance.new('Frame');
-BgOverlay.Size = UDim2.new(1, 0, 1, 0);
-BgOverlay.BackgroundColor3 = Color3.new(0, 0, 0);
-BgOverlay.BackgroundTransparency = 0.6;
-BgOverlay.BorderSizePixel = 0;
-BgOverlay.ZIndex = 0;
-BgOverlay.Visible = false;
-BgOverlay.Parent = ScreenGui;
 
-local BgLogo = Instance.new('ImageLabel');
-BgLogo.Size = UDim2.new(0, 300, 0, 300);
-BgLogo.Position = UDim2.new(0.5, -150, 0.5, -150);
-BgLogo.BackgroundTransparency = 1;
-BgLogo.Image = 'rbxassetid://81877860557650';
-BgLogo.ZIndex = 0;
-BgLogo.Visible = false;
-BgLogo.Parent = ScreenGui;
-
--- Spin logo each frame when visible
-RunService.RenderStepped:Connect(function()
-	if BgLogo.Visible then
-		BgLogo.Rotation = BgLogo.Rotation + 0.3;
-	end
-end);
 
 local Toggles = {};
 local Options = {};
@@ -2950,10 +2925,10 @@ function Library:CreateWindow(...)
     });
 
     local WindowLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 7, 0, 0);
-        Size = UDim2.new(0, 0, 0, 25);
+        Position = UDim2.new(0, 0, 0, 0);
+        Size = UDim2.new(1, 0, 0, 25);
         Text = Config.Title or '';
-        TextXAlignment = Enum.TextXAlignment.Left;
+        TextXAlignment = Enum.TextXAlignment.Center;
         ZIndex = 1;
         Parent = Inner;
     });
@@ -3467,7 +3442,7 @@ function Library:CreateWindow(...)
     local ResizeGrip = Library:Create('ImageLabel', {
         BackgroundTransparency = 1;
         Image = 'rbxassetid://6031094678';
-        ImageColor3 = Color3.fromRGB(150, 150, 150);
+        ImageColor3 = Color3.fromRGB(0, 85, 255);
         AnchorPoint = Vector2.new(1, 1);
         Position = UDim2.new(1, 0, 1, 0);
         Size = UDim2.new(0, 14, 0, 14);
@@ -3504,8 +3479,6 @@ function Library:CreateWindow(...)
 
     function Library.Toggle()
         Outer.Visible = not Outer.Visible;
-        BgOverlay.Visible = Outer.Visible;
-        BgLogo.Visible = Outer.Visible;
         ModalElement.Modal = Outer.Visible;
 
         local oIcon = Mouse.Icon;
