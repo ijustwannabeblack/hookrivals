@@ -3699,6 +3699,10 @@ end
         YOU CAN FILTER OUT LISTS/PLAYERLIST USING A FUNCTION INSIDE OF THE library:list() AND library:playerlist() UNDER cfg:sort(keyword: string)
 ]]
 
+return library
+
+-- Example (disabled by return above):
+--[[
 local window = library:window({
 	name = os.date('<font color="rgb(170,85,235)">obelus</font> | %b %d %Y'),
 	size = dim2(0, 516, 0, 563),
@@ -3941,5 +3945,5 @@ other:addButton({
 		library:unloadMenu()
 	end,
 })
+--]]
 -- --
---
