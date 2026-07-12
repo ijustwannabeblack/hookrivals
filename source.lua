@@ -6348,6 +6348,36 @@ function NeverLose:CreateWindow(Config)
 		return Watermark_lb;
 	end;
 
+	-- Dark overlay + spinning logo when window is open
+	local Overlay = Instance.new("Frame")
+	Overlay.Size = UDim2.new(1, 0, 1, 0)
+	Overlay.BackgroundColor3 = Color3.new(0, 0, 0)
+	Overlay.BackgroundTransparency = 0.5
+	Overlay.BorderSizePixel = 0
+	Overlay.ZIndex = 0
+	Overlay.Active = true
+
+	local SpinLogo = Instance.new("ImageLabel")
+	SpinLogo.Size = UDim2.new(0, 300, 0, 300)
+	SpinLogo.Position = UDim2.new(0.5, -150, 0.5, -150)
+	SpinLogo.BackgroundTransparency = 1
+	SpinLogo.Image = Window.Logo
+	SpinLogo.Parent = Overlay
+
+	local SpinTween
+
+	Window.Signal:Connect(function(open)
+		if open then
+			Overlay.Parent = NeverLose.ScreenGui
+			SpinLogo.Rotation = 0
+			SpinTween = TweenService:Create(SpinLogo, TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1), { Rotation = 360 })
+			SpinTween:Play()
+		else
+			Overlay.Parent = nil
+			if SpinTween then SpinTween:Cancel() end
+		end
+	end)
+
 	Window:SetRender(false);
 
 	return Window;
