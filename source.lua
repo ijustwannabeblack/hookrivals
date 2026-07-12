@@ -1739,6 +1739,8 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		-- KEYBIND BOX (on the left of the toggle)
 		local KeybindFrame;
 		local KeybindLabel;
+		local updateKeybindSize;
+		local updateKeybindVisual;
 
 		if Config.Keybind then
 			local UICorner_kb = Instance.new("UICorner")
@@ -1780,14 +1782,14 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			KeybindLabel.TextSize = 10.000
 			KeybindLabel.TextTransparency = 0.500
 
-			local function updateKeybindSize()
+			updateKeybindSize = function()
 				local size = TextService:GetTextSize(KeybindLabel.Text,KeybindLabel.TextSize,KeybindLabel.Font,Vector2.new(math.huge,math.huge));
 				KeybindFrame.Size = UDim2.new(0, size.X + 7, 0, 18)
 			end;
 
 			updateKeybindSize();
 
-			local function updateKeybindVisual(on)
+			updateKeybindVisual = function(on)
 				if on then
 					NeverLose.PlayAnimate(KeybindFrame,SlowyTween,{
 						BackgroundColor3 = NeverLose.AccentColor
