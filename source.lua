@@ -18,6 +18,22 @@ ScreenGui.Parent = CoreGui;
 
 
 
+-- Spinning logo
+local BgLogo = Instance.new('ImageLabel');
+BgLogo.Size = UDim2.new(0, 300, 0, 300);
+BgLogo.Position = UDim2.new(0.5, -150, 0.5, -150);
+BgLogo.BackgroundTransparency = 1;
+BgLogo.Image = 'rbxassetid://81877860557650';
+BgLogo.ZIndex = 0;
+BgLogo.Visible = false;
+BgLogo.Parent = ScreenGui;
+
+RunService.RenderStepped:Connect(function()
+	if BgLogo.Visible then
+		BgLogo.Rotation = BgLogo.Rotation + 0.3;
+	end
+end);
+
 local Toggles = {};
 local Options = {};
 
@@ -3479,6 +3495,7 @@ function Library:CreateWindow(...)
 
     function Library.Toggle()
         Outer.Visible = not Outer.Visible;
+        BgLogo.Visible = Outer.Visible;
         ModalElement.Modal = Outer.Visible;
 
         local oIcon = Mouse.Icon;
