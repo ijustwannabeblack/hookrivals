@@ -16,25 +16,6 @@ ProtectGui(ScreenGui);
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 ScreenGui.Parent = CoreGui;
 
--- Spinning logo
-local BgLogo = Instance.new('TextLabel');
-BgLogo.Size = UDim2.new(0, 200, 0, 200);
-BgLogo.Position = UDim2.new(0.5, -100, 0.5, -100);
-BgLogo.BackgroundTransparency = 1;
-BgLogo.Text = '✦';
-BgLogo.TextColor3 = Color3.fromRGB(128, 0, 255);
-BgLogo.TextSize = 120;
-BgLogo.Font = Enum.Font.GothamMedium;
-BgLogo.ZIndex = 0;
-BgLogo.Visible = false;
-BgLogo.Parent = ScreenGui;
-
-RunService.RenderStepped:Connect(function()
-	if BgLogo.Visible then
-		BgLogo.Rotation = BgLogo.Rotation + 0.5;
-	end
-end);
-
 local Toggles = {};
 local Options = {};
 
@@ -3496,7 +3477,6 @@ function Library:CreateWindow(...)
 
     function Library.Toggle()
         Outer.Visible = not Outer.Visible;
-        BgLogo.Visible = Outer.Visible;
         ModalElement.Modal = Outer.Visible;
 
         local oIcon = Mouse.Icon;
