@@ -16,19 +16,22 @@ ProtectGui(ScreenGui);
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 ScreenGui.Parent = CoreGui;
 
--- Spinning logo
-local BgLogo = Instance.new('ImageLabel');
-BgLogo.Size = UDim2.new(0, 300, 0, 300);
-BgLogo.Position = UDim2.new(0.5, -150, 0.5, -150);
+-- Spinning logo (TextLabel with star symbol)
+local BgLogo = Instance.new('TextLabel');
+BgLogo.Size = UDim2.new(0, 200, 0, 200);
+BgLogo.Position = UDim2.new(0.5, -100, 0.5, -100);
 BgLogo.BackgroundTransparency = 1;
-BgLogo.Image = 'rbxassetid://81877860557650';
+BgLogo.Text = '✦';
+BgLogo.TextColor3 = Color3.fromRGB(128, 0, 255);
+BgLogo.TextSize = 120;
+BgLogo.Font = Enum.Font.GothamMedium;
 BgLogo.ZIndex = 0;
 BgLogo.Visible = false;
 BgLogo.Parent = ScreenGui;
 
 RunService.RenderStepped:Connect(function()
 	if BgLogo.Visible then
-		BgLogo.Rotation = BgLogo.Rotation + 0.3;
+		BgLogo.Rotation = BgLogo.Rotation + 0.5;
 	end
 end);
 
@@ -3453,31 +3456,31 @@ function Library:CreateWindow(...)
     });
 
     -- Resize handle (bottom-right corner)
-    local ResizeGrip = Library:Create('ImageLabel', {
-        BackgroundTransparency = 1;
-        Image = 'rbxassetid://6031094678';
-        ImageColor3 = Color3.fromRGB(0, 85, 255);
-        AnchorPoint = Vector2.new(1, 1);
-        Position = UDim2.new(1, 0, 1, 0);
-        Size = UDim2.new(0, 14, 0, 14);
-        ZIndex = 10;
-        Parent = Outer;
-    });
+    local ResizeGrip = Instance.new('Frame');
+    ResizeGrip.BackgroundColor3 = Color3.fromRGB(0, 85, 255);
+    ResizeGrip.BorderSizePixel = 0;
+    ResizeGrip.AnchorPoint = Vector2.new(1, 1);
+    ResizeGrip.Position = UDim2.new(1, 0, 1, 0);
+    ResizeGrip.Size = UDim2.new(0, 16, 0, 16);
+    ResizeGrip.ZIndex = 10;
+    ResizeGrip.Parent = Outer;
+
+    Instance.new('UICorner', ResizeGrip).CornerRadius = UDim.new(0, 3);
 
     do
         local resizing = false
-        local startPos, startSize
 
         ResizeGrip.InputBegan:Connect(function(Input)
             if Input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
             resizing = true
-            startPos = Vector2.new(Mouse.X, Mouse.Y)
-            startSize = Outer.Size
+            local startMouse = Vector2.new(Mouse.X, Mouse.Y)
+            local startW = Outer.AbsoluteSize.X
+            local startH = Outer.AbsoluteSize.Y
 
             while resizing and InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-                local delta = Vector2.new(Mouse.X, Mouse.Y) - startPos
-                local newW = math.max(300, startSize.X.Offset + delta.X)
-                local newH = math.max(200, startSize.Y.Offset + delta.Y)
+                local delta = Vector2.new(Mouse.X, Mouse.Y) - startMouse
+                local newW = math.max(300, startW + delta.X)
+                local newH = math.max(200, startH + delta.Y)
                 Outer.Size = UDim2.new(0, newW, 0, newH)
                 RenderStepped:Wait()
             end
