@@ -21,7 +21,7 @@ local BgLogo = Instance.new('ImageLabel');
 BgLogo.Size = UDim2.new(0, 300, 0, 300);
 BgLogo.Position = UDim2.new(0.5, -150, 0.5, -150);
 BgLogo.BackgroundTransparency = 1;
-BgLogo.Image = 'rbxassetid://81877860557650';
+BgLogo.Image = 'http://www.roblox.com/asset/?id=81877860557650';
 BgLogo.ZIndex = 0;
 BgLogo.Visible = false;
 BgLogo.Parent = ScreenGui;
@@ -3531,6 +3531,14 @@ function Library:CreateWindow(...)
     end))
 
     if Config.AutoShow then task.spawn(Library.Toggle) end
+
+    -- Keep keybind list inside the menu so it moves/resizes with it
+    if Library.KeybindFrame then
+        Library.KeybindFrame.Parent = Outer
+        Library.KeybindFrame.AnchorPoint = Vector2.new(0, 0)
+        Library.KeybindFrame.Position = UDim2.new(0, 8, 0, 30)
+        Library.KeybindFrame.ZIndex = 10
+    end
 
     Window.Holder = Outer;
 
